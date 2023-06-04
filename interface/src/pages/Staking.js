@@ -2,6 +2,7 @@ import { useAccount, useNetwork } from 'wagmi'
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useEffect, useState } from 'react';
 import { ankrChains } from '../constants';
+import { chainsList } from '../constants';
 import { Link } from "react-router-dom";
 
 function Staking () {
@@ -21,8 +22,6 @@ function Staking () {
                 data.services.map(metric => {
                     metricsData.set(metric.serviceName, metric)
                 })
-                console.log(metricsData.has("bnb"))
-                console.log(metricsData)
                 setMetrics(metricsData) 
 
             })
@@ -37,13 +36,15 @@ function Staking () {
         )
     }
 
-    const ChainObject = ({chainObj}) => {
-        const ankrChain = ankrChains[chainObj.id]
+    const ChainObject = ({chainId}) => {
+        const ankrChain = ankrChains[chainId]
+        console.log(ankrChain)
+        console.log("Inside testing")
         return (
             <div className='drop-shadow-xs rounded-[20px] w-full h-[280px] bg-white p-8' key={ankrChain.serviceName}>
                 <div className='flex flex-col items-start justify-center w-content h-full space-y-4'>
                     <img src={ankrChain.image} className="w-16 h-16" />
-                    <p className='font-semibold text-2xl'>{chainObj.name}</p>
+                    <p className='font-semibold text-2xl'>{ankrChain.name}</p>
                     <div className='space-y-4'>
                         <div className='flex space-x-10'>
                             <div>
@@ -57,7 +58,7 @@ function Staking () {
                         </div>
                     </div>
                     <div className='w-full'>
-                        <Link to={`/staking/${chainObj.id}`} className='rounded-lg bg-blue-600 text-white px-12 py-[12px]'>Stake</Link>
+                        {chainId === 137 ? <button disabled className='rounded-lg bg-gray-400 text-white px-12 py-[12px]'>Disabled</button> : <Link to={`/staking/${chainId}`} className='rounded-lg bg-blue-600 text-white px-12 py-[12px]'>Stake</Link>}
                     </div>
                 </div>
             </div>
@@ -68,13 +69,16 @@ function Staking () {
     return (
         <div className="flex justify-center items-center w-full h-5/6">
             <div className='grid grid-cols-3 w-full gap-8 mx-24'>
-                {chains.filter(chainObj => {
-                    return ankrChains[chainObj.id] !== undefined
-                }).map(chainObj => {
-                    return (
-                        <ChainObject chainObj={chainObj}/>
-                    )
-                })}
+                {
+                    chainsList.map(chainId => {
+                        // console.log(chainId)
+                        return (
+                            <div>
+                                <ChainObject chainId={chainId}/>
+                            </div>
+                        )
+                    })
+                }
              </div>
         </div>
     )

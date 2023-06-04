@@ -21,7 +21,7 @@ import Execute from './pages/Execute';
 import Navbar from './components/Navbar';
 
 const { chains, publicClient } = configureChains(
-  [avalancheFuji, bscTestnet, polygonMumbai, polygonZkEvm, fantomTestnet],
+  [polygonZkEvm],
   [publicProvider()],
 );
 
