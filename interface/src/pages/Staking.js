@@ -6,7 +6,7 @@ import { chainsList } from '../constants';
 import { Link } from "react-router-dom";
 
 function Staking () {
-
+    
     const {isConnected} = useAccount()
     const { chain, chains } = useNetwork()
     const [metrics, setMetrics] = useState(new Map())
@@ -58,7 +58,7 @@ function Staking () {
                         </div>
                     </div>
                     <div className='w-full'>
-                        {chainId === 137 ? <button disabled className='rounded-lg bg-gray-400 text-white px-12 py-[12px]'>Disabled</button> : <Link to={`/staking/${chainId}`} className='rounded-lg bg-blue-600 text-white px-12 py-[12px]'>Stake</Link>}
+                        {ankrChain.disabled ? <button disabled className='rounded-lg bg-gray-400 text-white px-12 py-[12px]'>Disabled</button> : <Link to={`/staking/${chainId}`} className='rounded-lg bg-blue-600 text-white px-12 py-[12px]'>Stake</Link>}
                     </div>
                 </div>
             </div>

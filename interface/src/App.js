@@ -12,7 +12,7 @@ import {
   WagmiConfig,
 } from 'wagmi';
 import { configureChains } from '@wagmi/core'
-import { avalancheFuji, bscTestnet, fantomTestnet, polygonMumbai, polygonZkEvm } from '@wagmi/core/chains'
+import { avalancheFuji, bscTestnet, fantomTestnet, polygonMumbai, polygonZkEvmTestnet } from '@wagmi/core/chains'
 import { publicProvider } from '@wagmi/core/providers/public'
 import Home from './pages/Home';
 import Staking from './pages/Staking';
@@ -21,7 +21,7 @@ import Execute from './pages/Execute';
 import Navbar from './components/Navbar';
 
 const { chains, publicClient } = configureChains(
-  [polygonZkEvm],
+  [polygonZkEvmTestnet],
   [publicProvider()],
 );
 
