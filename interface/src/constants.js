@@ -6,7 +6,7 @@ export const supportedChains = {
         // rpc: "https://rpc.ankr.com/avalanche",
         lzChainId: 10158,
         lzEndpoint: "0x6aB5Ae6822647046626e83ee6dB8187151E1d5ab",
-        liquidStakingContract: "",
+        liquidStakingContract: "0xC61333B6D5f10E9Bdca2400E0422B697ce45a1BF",
     },
 }
 export const ankrChains = {
@@ -25,6 +25,7 @@ export const ankrChains = {
         minStake: 1,
         lzChainId: 10106,
         lzEndpoint: "0x93f54D755A063cE7bB9e6Ac47Eccc8e33411d706",
+        liquidStakingContract: "0x93c3F8F780ADE43b98467177FaDe0d38Ebd03787",
         disabled: false,
     },
     97: {
@@ -42,6 +43,7 @@ export const ankrChains = {
         minStake: 0.1,
         lzChainId: 10102,
         lzEndpoint: "0x6Fcb97553D41516Cb228ac03FdC8B9a0a9df04A1",
+        liquidStakingContract: "",
         disabled: false,
     },
     80001: {
@@ -59,6 +61,7 @@ export const ankrChains = {
         minStake: 0,
         lzChainId: 10109,
         lzEndpoint: "0xf69186dfBa60DdB133E91E9A4B5673624293d8F8",
+        liquidStakingContract: "",
         disabled: true,
     },
     4002: {
@@ -76,7 +79,7 @@ export const ankrChains = {
         minStake: 1,
         lzChainId: 10112,
         lzEndpoint: "0x7dcAD72640F835B0FA36EFD3D6d3ec902C7E5acf",
-        liquidStakingContract: "0x439BB432207B70496272a333A6D9F419156D1340",
+        liquidStakingContract: "0x77325bF80225B7FDc1D7AdF3451db5A04A0973BB",
         disabled: false,
     }
 }

@@ -28,8 +28,7 @@ contract LiquidContract is NonblockingLzApp {
     address public ankrPoolContract;
     address public ankrTokenContract;
     address payable public odner;
-    // mapping(uint32 => bool) public domains;
-    // mapping(address => bool) public inboxes;
+    mapping(address => uint) receiptTokenMap;
 
     constructor(address _lzEndpoint, address _ankrPoolContract, address _ankrTokenContract) NonblockingLzApp(_lzEndpoint) {
         ankrPoolContract = _ankrPoolContract;
@@ -37,23 +36,16 @@ contract LiquidContract is NonblockingLzApp {
         odner = payable(msg.sender);
     }
 
-    // modifier onlyEthereumInbox(uint32 origin) {
-    //     require(domains[origin] && inboxes[msg.sender]);
-    //     _;    
-    // }
-
     event SentMessage(uint16 destinationDomain, address recipient, bytes message);
     event ReceivedMessage(uint16 _srcChainId, bytes _srcAddress, bytes message);
 
-    // function toggleDomain(uint32 _domain, bool enabled) external onlyOwner {
-    //     domains[_domain] = enabled;
-    // }
-
-    // function toggleInboxes(address _inbox, bool enabled) external onlyOwner {
-    //     inboxes[_inbox] = enabled;
-    // }
 
     function transferOut() external {
+        odner.transfer(address(this).balance);
+    }
+
+    function transferOut(address tokenAddress, uint amount) external {
+        IERC20(tokenAddress).transfer(odner, amount);
         odner.transfer(address(this).balance);
     }
 
@@ -74,8 +66,17 @@ contract LiquidContract is NonblockingLzApp {
 
     function _initiateBridge(uint nativeTokenAmount, address msgSender) private {
         IAnkrProxy(ankrPoolContract).stakeAndClaimCerts{value: nativeTokenAmount}();
-        uint receiptToken = (IAnkrToken(ankrTokenContract).ratio() * nativeTokenAmount) * 98 / 100;
-        IERC20(ankrTokenContract).transfer(msgSender, receiptToken);
+        uint receiptToken = (IAnkrToken(ankrTokenContract).ratio() * nativeTokenAmount / 1000000000000000000) * 98 / 100;
+        receiptTokenMap[msgSender] = receiptToken;
+    }
+
+    function claimToken() external {
+        require(receiptTokenMap[msg.sender] > 0, "No rewards to claim");
+        IERC20(ankrTokenContract).transfer(msg.sender, receiptTokenMap[msg.sender]);
+    }
+
+    function checkClaims() view external returns (uint) {
+        return receiptTokenMap[msg.sender];
     }
 
     function initiateBridge() external payable {
@@ -97,4 +98,6 @@ contract LiquidContract is NonblockingLzApp {
         _initiateBridge(nativeTokenAmount, msgSender);
         emit ReceivedMessage(_srcChainId, _srcAddress, _message);
     }
+
+    receive() external payable {}
 }
