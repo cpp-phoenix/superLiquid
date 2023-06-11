@@ -1,15 +1,16 @@
 import { useParams } from "react-router-dom";
 import { useAccount, useNetwork, useBalance } from 'wagmi'
 import { ethers } from 'ethers';
-import { useWalletClient, usePublicClient } from "wagmi";
+import { useSigner, useProvider } from "wagmi";
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { ankrChains } from '../constants';
+import { ankrChains, supportedChains } from '../constants';
 import { useEffect, useState } from "react";
+import { useAlert, positions } from 'react-alert';
 
 function Execute () {
 
-    const { data: signer } = useWalletClient();
-    const { data: provider } = usePublicClient();
+    const { data: signer } = useSigner();
+    const { data: provider } = useProvider();
 
     let { chainId } = useParams();
     const {address, isConnected} = useAccount()
@@ -19,23 +20,48 @@ function Execute () {
     })
     const [inputAmount, setInputAmount] = useState(0);
     const [payAmount, setPayAmount] = useState(0);
+    const alert = useAlert()
 
     const estimateAmount = (val) => {
         setInputAmount(val)
-        // fetch(`https://rest.coinapi.io/v1/exchangerate/${ankrChains[chainId].symbol}/${chain.nativeCurrency.symbol}`, {
-        //     method: 'GET',
-        //     headers: {
-        //       'X-CoinAPI-Key': 'A4167619-513C-47F5-B35F-10FFF9EB297F',
-        //     },
-        // })
-        // .then((response) => response.json())
-        // .then((data) => {
-        //     console.log(data)
-        //     setPayAmount(data.rate * val)
-        // })
-        // .catch((err) => {
-        // console.log(err.message);
-        // });
+        fetch(`https://rest.coinapi.io/v1/exchangerate/${ankrChains[chainId].symbol}/${chain.nativeCurrency.symbol}`, {
+            method: 'GET',
+            headers: {
+              'X-CoinAPI-Key': 'A4167619-513C-47F5-B35F-10FFF9EB297F',
+            },
+        })
+        .then((response) => response.json())
+        .then((data) => {
+            console.log(data)
+            setPayAmount((data.rate * val).toFixed(5))
+        })
+        .catch((err) => {
+        console.log(err.message);
+        });
+    }
+
+    const initiateBridge = async () => {
+        if(inputAmount < ankrChains[chainId].minStake || payAmount <= 0) {
+            alert.error(<div>input less than min stake</div>, {
+                timeout: 6000,
+                position: positions.BOTTOM_RIGHT
+            });
+        } else {
+            console.log(chain.id)
+            const liquidStakingContract = new ethers.Contract(supportedChains[chain.id].liquidStakingContract, supportedChains[chain.id].liquidStakingABI, provider);
+            const signedContract = liquidStakingContract.connect(signer);
+            // const txnReceipt = await signedContract.initiateXStaking({value: ethers.utils.parseUnits(payAmount.toString(), "ether")}, ankrChains[chainId].lzChainId, ankrChains[chainId].liquidStakingContract, ethers.utils.parseUnits(inputAmount.toString(), "ether"))
+            const txnReceipt = await signedContract.initiateXStaking(ankrChains[chainId].lzChainId, ankrChains[chainId].liquidStakingContract, ethers.utils.parseUnits(inputAmount.toString(), "ether"), {value: ethers.utils.parseUnits(payAmount.toString(), "ether")})
+            console.log(txnReceipt)
+            alert.success(
+                <div>
+                    <div>transaction sent</div>
+                    <button className='text-xs' onClick={()=> window.open(supportedChains[chain.id].explorer + txnReceipt, "_blank")}>View on explorer</button>
+                </div>, {
+                timeout: 0,
+                position: positions.BOTTOM_RIGHT
+            });
+        }
     }
 
     if(!isConnected) {
@@ -74,9 +100,9 @@ function Execute () {
                 </div>
                 <div className="w-full flex justify-between">
                     <div className="font-semibold text-sm">You will pay</div>
-                    <div className="font-semibold text-sm"> {payAmount.toFixed(5)} {chain.nativeCurrency.symbol.toUpperCase()}</div>
+                    <div className="font-semibold text-sm"> {payAmount} {chain.nativeCurrency.symbol.toUpperCase()}</div>
                 </div>
-                <button className="text-lg font-bold text-white bg-blue-500 hover:bg-blue-600 rounded-[18px] w-full border py-4">Initiate</button>
+                <button className="text-lg font-bold text-white bg-blue-500 hover:bg-blue-600 rounded-[18px] w-full border py-4" onClick={() => {initiateBridge()}}>Initiate</button>
                 <div className="text-sm text-gray-400">Source chain is <span className="font-semiibold text-black">{chain.name}</span></div>
             </div>
         </div>

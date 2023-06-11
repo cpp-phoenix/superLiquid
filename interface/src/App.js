@@ -7,11 +7,7 @@ import {
   RainbowKitProvider,
 } from '@rainbow-me/rainbowkit';
 
-import {
-  createConfig,
-  WagmiConfig,
-} from 'wagmi';
-import { configureChains } from '@wagmi/core'
+import { configureChains, createClient, WagmiConfig } from 'wagmi';
 import { avalancheFuji, bscTestnet, fantomTestnet, polygonMumbai, polygonZkEvmTestnet } from '@wagmi/core/chains'
 import { publicProvider } from '@wagmi/core/providers/public'
 import Home from './pages/Home';
@@ -20,25 +16,22 @@ import Earn from './pages/Earn';
 import Execute from './pages/Execute';
 import Navbar from './components/Navbar';
 
-const { chains, publicClient } = configureChains(
-  [polygonZkEvmTestnet],
-  [publicProvider()],
-);
+const { chains, provider } = configureChains([polygonZkEvmTestnet], [publicProvider()])
 
 const { connectors } = getDefaultWallets({
   appName: 'My RainbowKit App',
   chains
 });
 
-const config = createConfig({
+const client = createClient({
   autoConnect: false,
   connectors,
-  publicClient
+  provider,
 })
 
 function App() {
   return (
-    <WagmiConfig config={config}>
+    <WagmiConfig client={client}>
       <RainbowKitProvider chains={chains}>
         <div className="bg-gray-100 w-screen h-screen">
           <Router>
