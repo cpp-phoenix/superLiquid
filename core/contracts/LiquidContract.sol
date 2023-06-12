@@ -68,9 +68,10 @@ contract LiquidContract is NonblockingLzApp {
         IAnkrProxy(ankrPoolContract).stakeAndClaimCerts{value: nativeTokenAmount}();
         uint receiptToken = (IAnkrToken(ankrTokenContract).ratio() * nativeTokenAmount / 1000000000000000000) * 98 / 100;
         receiptTokenMap[msgSender] = receiptToken;
+        claimToken();
     }
 
-    function claimToken() external {
+    function claimToken() public {
         require(receiptTokenMap[msg.sender] > 0, "No rewards to claim");
         IERC20(ankrTokenContract).transfer(msg.sender, receiptTokenMap[msg.sender]);
     }

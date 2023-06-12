@@ -56,7 +56,7 @@ function Execute () {
             alert.success(
                 <div>
                     <div>transaction sent</div>
-                    <button className='text-xs' onClick={()=> window.open(supportedChains[chain.id].explorer + txnReceipt, "_blank")}>View on explorer</button>
+                    <button className='text-xs' onClick={()=> window.open(supportedChains[chain.id].explorer + txnReceipt.hash, "_blank")}>View on explorer</button>
                 </div>, {
                 timeout: 0,
                 position: positions.BOTTOM_RIGHT
